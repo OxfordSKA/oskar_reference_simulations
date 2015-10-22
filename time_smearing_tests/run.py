@@ -1,4 +1,4 @@
-#!venv/bin/python
+#!../venv/bin/python
 
 import json
 import os
@@ -6,7 +6,8 @@ import argparse
 from os.path import isdir, join
 from shutil import copyfile
 import drivecasa
-from bda import simulate, plot
+import simulate
+import plot
 
 
 if __name__ == '__main__':
@@ -45,30 +46,13 @@ if __name__ == '__main__':
     copyfile(args.config, join(sim_dir, args.config))
 
     # Simulation.
-    if not isdir(join(sim_dir, settings['sim1']['output_ms'])):
-        simulate.run(settings, settings_group_name='sim1')
-    if not isdir(join(sim_dir, settings['sim1a']['output_ms'])):
-        simulate.run(settings, settings_group_name='sim1a')
-    if not isdir(join(sim_dir, settings['sim2']['output_ms'])):
-        simulate.run(settings, settings_group_name='sim2')
-    if not isdir(join(sim_dir, settings['sim3']['output_ms'])):
-        simulate.run(settings, settings_group_name='sim3')
-    if not isdir(join(sim_dir, settings['sim4']['output_ms'])):
-        simulate.run(settings, settings_group_name='sim4')
+    simulate.run(settings)
 
-    # Averaging.
-    if not isdir(join(sim_dir, settings['ave2']['output_ms'])):
-        casa.run_script(["average_group_name = '{}'".format('ave2')])
-        casa.run_script_from_file('bda/casa_scripts/average_ms.py')
-    if not isdir(join(sim_dir, settings['ave3']['output_ms'])):
-        casa.run_script(["average_group_name = '{}'".format('ave3')])
-        casa.run_script_from_file('bda/casa_scripts/average_ms.py')
-    if not isdir(join(sim_dir, settings['ave4']['output_ms'])):
-        casa.run_script(["average_group_name = '{}'".format('ave4')])
-        casa.run_script_from_file('bda/casa_scripts/average_ms.py')
+    # Average.
+    casa.run_script_from_file('average_ms.py')
 
     # Image.
-    casa.run_script_from_file('bda/casa_scripts/image.py')
+    casa.run_script_from_file('image.py')
 
     # Plot results.
     plot.run(settings)

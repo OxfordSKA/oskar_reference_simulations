@@ -8,7 +8,7 @@ import os
 import time
 from os.path import join
 import json
-from bda import utilities
+import utilities
 
 def fov_to_cellsize(fov, im_size):
     """Obatin cellsize from fov and image size."""
@@ -19,7 +19,7 @@ def fov_to_cellsize(fov, im_size):
 
 
 def casa_image(ms, rootname, data_column, imsize, fov, ra0, dec0,
-               w_planes=None):
+               weighting, w_planes=None):
     """Make an image using CASA.
 
     http://casa.nrao.edu/docs/CasaRef/imager-Module.html#x636-6490002.5
@@ -45,7 +45,7 @@ def casa_image(ms, rootname, data_column, imsize, fov, ra0, dec0,
                    phasecenter=me.direction('J2000', '%.14fdeg' % ra0,
                                             '%.14fdeg' % dec0))
     # im.weight(type='natural')
-    im.weight(type='uniform')
+    im.weight(type=weighting)
     if w_planes:
         im.setoptions(ftmachine='wproject', wprojplanes=w_planes,
                       gridfunction='SF', padding=1.2,
@@ -70,7 +70,7 @@ def casa_image(ms, rootname, data_column, imsize, fov, ra0, dec0,
         return
     im.close()
     ia.open(dirty)
-    ia.tofits(rootname + '_dirty.fits', overwrite=True)
+    ia.tofits(rootname + '.fits', overwrite=True)
     ia.close()
     # ia.open(psf)
     # ia.tofits(rootname+'_psf.fits', overwrite=True)
@@ -85,28 +85,30 @@ if __name__ == "__main__":
 
     settings = utilities.byteify(json.load(open(config_file)))
 
-    # ---------------------------------------
     sim_dir = settings['path']
+    ms_files = [f for f in os.listdir(os.path.abspath(sim_dir))
+                if f.endswith('.ms') and os.path.isdir(join(sim_dir, f))]
+
     if settings.has_key('imaging'):
         settings = settings['imaging']
-        for data in settings['data']:
-            ms = join(sim_dir, data[0])
+        column = settings['column']
+        for file in ms_files:
+            ms = join(sim_dir, file)
+
+
             if not os.path.isdir(ms):
                 print 'WARNING: MS not found, skipping imaging. (%s)' % ms
                 continue
             root_name = os.path.splitext(ms)[0]
-            column = data[1]
-            if os.path.exists('{}_{}_dirty.fits'.format(root_name, column)):
-                print 'INFO: image (%s) already exists, skipping.' % \
-                      (root_name + '_dirty.fits')
+            if os.path.exists('{}.fits'.format(root_name)):
                 continue
             print '+ Imaging with CASA ... [ms=%s -> %s : %s]' % (ms, root_name,
                                                                   column)
             t0 = time.time()
-            casa_image(ms, '{}_{}'.format(root_name, column), column,
+            casa_image(ms, '{}'.format(root_name), column,
                        settings['size'], settings['fov_deg'],
                        settings['ra_deg'], settings['dec_deg'],
-                       settings['w_planes'])
+                       settings['weighting'], settings['w_planes'])
             print '*' * 80
             print '  - Finished imaging in %.3fs' % (time.time() - t0)
             print '*' * 80

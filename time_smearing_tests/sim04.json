@@ -1,0 +1,36 @@
+{
+  "path": "sim04",
+
+  "sim":
+  {
+    "telescope":
+    {
+      "path": "ska1_meerkat_mid_combined_july_2015.tm",
+      "lon_deg": 21.442909,
+      "lat_deg": -30.739475
+    },
+    "observation":
+    {
+      "ra_deg": -90.3545848760,
+      "dec_deg": -8.5711239906,
+      "freq_hz": 700.0e6,
+      "channel_bw_hz": 0.0,
+      "start_time_mjd": 57086.113194,
+      "obs_length": 0.5,
+      "num_times": [1, 10, 100, 1000]
+    }
+  },
+
+  "imaging":
+  {
+    "overwrite": true,
+    "weighting": "uniform",
+    "column": "DATA",
+    "size": [512, 512],
+    "fov_deg": [0.02, 0.02],
+    "ra_deg": -90.35458487600000,
+    "dec_deg": -7.67112399060000,
+    "w_planes": 0
+  }
+
+}

@@ -7,6 +7,7 @@ from collections import OrderedDict
 import subprocess
 import argparse
 import json
+from shutil import copyfile
 import numpy
 import math
 
@@ -93,26 +94,26 @@ def run(settings, verbose=True):
     sim_dir = settings['path']
     sim = settings['sim']
     obs = sim['observation']
-    sky_file = join(sim_dir, 'sky_%5.3f' % obs['obs_length'])
+    sky_file = join(sim_dir, 'sky_%5.3f.osm' % obs['obs_length'])
     create_sky_model(sky_file, [obs['ra_deg']], [obs['dec_deg']+0.9], [1.0])
 
-    # With analytical smearing
     for n in obs['num_times']:
+        # ==== With analytical smearing ====
         ini_file = join(sim_dir, 'n%04i_smearing.ini' % n)
         ms_out = join(sim_dir, 'n%04i_smearing.ms' % n)
-        s = create_settings(settings, sky_file, ms_out,
-                            num_times=n, smearing=True)
-        dict_to_ini(s, ini_file)
-        run_interferometer(ini_file, verbose)
-
-    # Without analytical smearing
-    for n in obs['num_times']:
+        if not os.path.isdir(ms_out):
+            s = create_settings(settings, sky_file, ms_out,
+                                num_times=n, smearing=True)
+            dict_to_ini(s, ini_file)
+            run_interferometer(ini_file, verbose)
+        # ===== Without analytical smearing =====
         ini_file = join(sim_dir, 'n%04i.ini' % n)
         ms_out = join(sim_dir, 'n%04i.ms' % n)
-        s = create_settings(settings, sky_file, ms_out,
-                            num_times=n, smearing=False)
-        dict_to_ini(s, ini_file)
-        run_interferometer(ini_file, verbose)
+        if not os.path.isdir(ms_out):
+            s = create_settings(settings, sky_file, ms_out,
+                                num_times=n, smearing=False)
+            dict_to_ini(s, ini_file)
+            run_interferometer(ini_file, verbose)
 
 
 if __name__ == '__main__':
@@ -135,5 +136,8 @@ if __name__ == '__main__':
         print 'ERROR: FAILED TO PARSE JSON CONFIG FILE!!'
         print e.message
         exit(1)
+
+    # Copy the settings file into the simulation directory.
+    copyfile(args.config, join(settings['path'], args.config))
 
     run(settings)

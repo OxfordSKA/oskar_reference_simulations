@@ -222,11 +222,77 @@ def plot_model_diff(settings):
     ax.set_xlim(0, 512)
     ax.grid(True)
 
-
     plt.savefig(join(sim_dir, 'model_diff.png'), dpi=300)
+
+
+def plot_diff(sim_dir, fits1, fits2, out_file):
+    stretch = 'linear'
+    fig = plt.figure(figsize=(6.5, 5.0))
+    hdu, data = get_hdu_diff(join(sim_dir, fits1), join(sim_dir, fits2), 1.0e6)
+    cmin = data.min()
+    cmax = data.max()
+    f = aplpy.FITSFigure(hdu, figure=fig, subplot=(1, 1, 1))
+    f.show_colorscale(vmin=cmin, vmax=cmax, stretch=stretch, cmap='afmhot')
+    f.add_colorbar()
+    f.colorbar.set_width(0.1)
+    f.colorbar.set_axis_label_text(r'$\mu$Jy / beam')
+    f.colorbar.set_axis_label_font(size='small')
+    f.tick_labels.set_font(size='x-small')
+    f.axis_labels.set_font(size='x-small')
+    f.add_grid()
+    # f.grid.set_color('white')
+    f.grid.set_linestyle('--')
+    f.grid.set_linewidth(0.5)
+    # f.grid.set_alpha(0.3)
+    f.set_title('%s - %s' % (fits1, fits2), fontsize='small', weight='bold')
+    # ax = fig.add_subplot(422)
+    # ax.plot(data[0, 0, data.shape[2]/2, :], 'x-', markersize=2.0)
+    # ax.set_xlim(0, 512)
+    # ax.grid(True)
+
+    f.add_label(0.03, 0.97,
+                '$\mathrm{min}:%.3e\, Jy$\n'
+                '$\mathrm{max}:%.3e\, Jy$\n'
+                '$\mathrm{mean}:%.3e\, Jy$\n'
+                '$\mathrm{std}:%.3e\, Jy$' %
+                (data.min()/1.0e6, data.max()/1.0e6,
+                 data.mean()/1.0e6, data.std()/1.0e6),
+                relative=True,
+                horizontalalignment='left',
+                verticalalignment='top',
+                fontsize='x-small',
+                bbox=dict(color='white', alpha=0.5, edgecolor='none',
+                          pad=5.0, linewidth=0.0))
+    plt.savefig(join(sim_dir, out_file), dpi=300)
 
 
 def run(settings):
     # plot_model_bda(settings)
-    plot_model(settings)
-    plot_model_diff(settings)
+    # plot_model(settings)
+    # plot_model_diff(settings)
+
+    sim_dir = settings['path']
+    images = [f for f in os.listdir(sim_dir) if f.endswith('.fits')]
+    for image in images:
+        print image
+
+    plot_diff(sim_dir, 'n0001_smearing.fits', 'n0001.fits',
+              'diff_n0001.png')
+
+    plot_diff(sim_dir, 'n0001_smearing.fits', 'ave_n0010.fits',
+              'diff_n0001_n0010.png')
+
+    plot_diff(sim_dir, 'n0001_smearing.fits', 'ave_n0010_smearing.fits',
+              'diff_n0001_n0010_smearing.png')
+
+    plot_diff(sim_dir, 'n0001_smearing.fits', 'ave_n0100.fits',
+              'diff_n0001_n0100.png')
+
+    plot_diff(sim_dir, 'n0001_smearing.fits', 'ave_n0100_smearing.fits',
+              'diff_n0001_n0100_smearing.png')
+
+    plot_diff(sim_dir, 'n0001_smearing.fits', 'ave_n1000.fits',
+              'diff_n0001_n1000.png')
+
+    plot_diff(sim_dir, 'n0001_smearing.fits', 'ave_n1000_smearing.fits',
+              'diff_n0001_n1000_smearing.png')
