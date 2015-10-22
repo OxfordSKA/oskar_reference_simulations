@@ -5,7 +5,7 @@
   {
     "telescope":
     {
-      "path": "models/ska1_meerkat_mid_combined_july_2015.tm",
+      "path": "ska1_meerkat_mid_combined_july_2015.tm",
       "lon_deg": 21.442909,
       "lat_deg": -30.739475
     },
