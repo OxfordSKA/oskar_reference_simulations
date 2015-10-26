@@ -38,6 +38,7 @@ if __name__ == '__main__':
     casa.run_script(["config_file = '{}'".format(args.config)])
 
     # Top level simulation output directory.
+    # TODO-BM use the filename of the settings file as the path?
     sim_dir = settings['path']
 
     # Create a copy of the settings file.

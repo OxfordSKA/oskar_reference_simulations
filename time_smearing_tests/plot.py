@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Plot a summary of results from the BDA pipeline."""
 
+
 import numpy
 import os
 from os.path import join
@@ -31,6 +32,7 @@ def get_hdu_diff(file1, file2, flux_scale=1.0e3):
     d = d1 - d2
     d *= flux_scale
     return pyfits.PrimaryHDU(d, h1), d
+
 
 def plot_model_bda(settings):
     sim_dir = settings['path']
@@ -225,7 +227,7 @@ def plot_model_diff(settings):
     plt.savefig(join(sim_dir, 'model_diff.png'), dpi=300)
 
 
-def plot_diff(sim_dir, fits1, fits2, out_file):
+def plot_diff(sim_dir, fits1, fits2, out_file, obs_length):
     stretch = 'linear'
     fig = plt.figure(figsize=(6.5, 5.0))
     hdu, data = get_hdu_diff(join(sim_dir, fits1), join(sim_dir, fits2), 1.0e6)
@@ -244,7 +246,8 @@ def plot_diff(sim_dir, fits1, fits2, out_file):
     f.grid.set_linestyle('--')
     f.grid.set_linewidth(0.5)
     # f.grid.set_alpha(0.3)
-    f.set_title('%s - %s' % (fits1, fits2), fontsize='small', weight='bold')
+    f.set_title('%.2fs: %s - %s' % (obs_length, fits1, fits2),
+                fontsize='small', weight='bold')
     # ax = fig.add_subplot(422)
     # ax.plot(data[0, 0, data.shape[2]/2, :], 'x-', markersize=2.0)
     # ax.set_xlim(0, 512)
@@ -272,27 +275,26 @@ def run(settings):
     # plot_model_diff(settings)
 
     sim_dir = settings['path']
+    obs_length = settings['sim']['observation']['obs_length']
     images = [f for f in os.listdir(sim_dir) if f.endswith('.fits')]
     for image in images:
         print image
 
-    plot_diff(sim_dir, 'n0001_smearing.fits', 'n0001.fits',
-              'diff_n0001.png')
-
-    plot_diff(sim_dir, 'n0001_smearing.fits', 'ave_n0010.fits',
-              'diff_n0001_n0010.png')
-
-    plot_diff(sim_dir, 'n0001_smearing.fits', 'ave_n0010_smearing.fits',
-              'diff_n0001_n0010_smearing.png')
-
-    plot_diff(sim_dir, 'n0001_smearing.fits', 'ave_n0100.fits',
-              'diff_n0001_n0100.png')
-
-    plot_diff(sim_dir, 'n0001_smearing.fits', 'ave_n0100_smearing.fits',
-              'diff_n0001_n0100_smearing.png')
-
-    plot_diff(sim_dir, 'n0001_smearing.fits', 'ave_n1000.fits',
-              'diff_n0001_n1000.png')
-
-    plot_diff(sim_dir, 'n0001_smearing.fits', 'ave_n1000_smearing.fits',
-              'diff_n0001_n1000_smearing.png')
+    plot_diff(sim_dir,'n0001_smearing.fits',
+              'n0001.fits', 'diff_n0001.png', obs_length)
+    plot_diff(sim_dir, 'n0001_smearing.fits',
+              'ave_n0002.fits', 'diff_n0001_n0002.png', obs_length)
+    plot_diff(sim_dir, 'n0001_smearing.fits',
+              'ave_n0002_smearing.fits', 'diff_n0001_n0002_smearing.png',
+              obs_length)
+    plot_diff(sim_dir, 'n0001_smearing.fits',
+              'ave_n0010.fits', 'diff_n0001_n0010.png', obs_length)
+    plot_diff(sim_dir, 'n0001_smearing.fits',
+              'ave_n0010_smearing.fits', 'diff_n0001_n0010_smearing.png',
+              obs_length)
+    plot_diff(sim_dir,
+              'n0001_smearing.fits',
+              'ave_n1000.fits', 'diff_n0001_n1000.png', obs_length)
+    plot_diff(sim_dir, 'n0001_smearing.fits',
+              'ave_n1000_smearing.fits', 'diff_n0001_n1000_smearing.png',
+              obs_length)

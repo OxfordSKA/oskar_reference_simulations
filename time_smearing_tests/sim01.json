@@ -17,7 +17,7 @@
       "channel_bw_hz": 0.0,
       "start_time_mjd": 57086.113194,
       "obs_length": 0.05,
-      "num_times": [1, 10, 100, 1000]
+      "num_times": [1, 2, 10, 1000]
     }
   },
 
@@ -27,10 +27,9 @@
     "weighting": "uniform",
     "column": "DATA",
     "size": [512, 512],
-    "fov_deg": [0.02, 0.02],
+    "fov_deg": [0.01, 0.01],
     "ra_deg": -90.35458487600000,
     "dec_deg": -7.67112399060000,
     "w_planes": 0
   }
-
 }

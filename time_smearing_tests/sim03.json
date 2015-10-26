@@ -1,5 +1,5 @@
 {
-  "path": "sim04",
+  "path": "sim03",
 
   "sim":
   {
@@ -16,7 +16,7 @@
       "freq_hz": 700.0e6,
       "channel_bw_hz": 0.0,
       "start_time_mjd": 57086.113194,
-      "obs_length": 1.0,
+      "obs_length": 0.5,
       "num_times": [1, 2, 10, 1000]
     }
   },
